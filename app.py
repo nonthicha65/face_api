@@ -1,45 +1,14 @@
-from flask import Flask, request, jsonify 
-from flask_cors import CORS
 from deepface import DeepFace
-import tempfile
-import requests
-import os  # <== เพิ่ม
+from flask import Flask, request, jsonify
 
 app = Flask(__name__)
-CORS(app)
 
-@app.route("/")
-def home():
-    return jsonify({"status": "Face API is running"})
+@app.route('/verify', methods=['POST'])
+def verify():
+    img1_path = request.form['img1']
+    img2_path = request.form['img2']
+    result = DeepFace.verify(img1_path, img2_path)
+    return jsonify(result)
 
-@app.route("/verify-face", methods=["POST"])
-def verify_face():
-    try:
-        data = request.get_json()
-        image1_url = data["image1_url"]
-        image2_url = data["image2_url"]
-
-        def download_image(url):
-            response = requests.get(url)
-            temp = tempfile.NamedTemporaryFile(delete=False, suffix=".jpg")
-            temp.write(response.content)
-            temp.close()
-            return temp.name
-
-        img1 = download_image(image1_url)
-        img2 = download_image(image2_url)
-
-        result = DeepFace.verify(img1, img2, enforce_detection=False)
-
-        return jsonify({
-            "match": result["verified"],
-            "distance": result["distance"],
-            "message": "Face verification completed"
-        })
-
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
