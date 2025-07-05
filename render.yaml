@@ -1,12 +1,6 @@
-flask==2.3.3
-flask-cors==4.0.0
-deepface==0.0.93
-gunicorn==21.2.0
-
-# dependencies ที่ deepface ต้องใช้
-tensorflow==2.10.0
-tf-keras==2.15.0
-opencv-python==4.9.0.80
-numpy==1.23.5
-pillow
-requests
+services:
+  - type: web
+    name: face-api
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
