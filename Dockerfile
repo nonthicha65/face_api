@@ -21,4 +21,4 @@ RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
 # รันแอปด้วย gunicorn ที่พอร์ต 10000 (Render ใช้ env PORT)
-CMD ["gunicorn", "app:app", "--bind", "0.0.0.0:10000"]
+CMD ["gunicorn", "app:app", "--bind", "0.0.0.0:$PORT"]
