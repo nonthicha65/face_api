@@ -10,7 +10,7 @@ colorama==0.4.6
 deepface==0.0.79
 filelock==3.18.0
 fire==0.7.0
-Flask==3.1.1
+Flask==2.2.5
 flask-cors==6.0.1
 flatbuffers==25.2.10
 gast==0.4.0
@@ -19,7 +19,7 @@ google-auth==2.40.3
 google-auth-oauthlib==0.4.6
 google-pasta==0.2.0
 grpcio==1.73.1
-gunicorn==23.0.0
+gunicorn==20.1.0
 h5py==3.14.0
 idna==3.10
 importlib_metadata==8.7.0
@@ -31,7 +31,7 @@ libclang==18.1.1
 Markdown==3.8.2
 MarkupSafe==3.0.2
 mtcnn==0.1.1
-numpy==2.0.2
+numpy==1.24.3
 oauthlib==3.3.1
 opencv-python==4.11.0.86
 opt_einsum==3.4.0
