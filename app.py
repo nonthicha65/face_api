@@ -45,3 +45,7 @@ def verify():
     except Exception as e:
         print(f"❌ Error during verification: {e}")
         return jsonify({"error": str(e)}), 500
+    
+if __name__ == "__main__":
+    # รันบนเครื่องเรา (development) — เปิดบนทุก interface ที่พอร์ต 5000
+    app.run(host="0.0.0.0", port=5000, debug=True)
