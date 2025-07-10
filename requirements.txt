@@ -7,7 +7,7 @@ certifi==2025.6.15
 charset-normalizer==3.4.2
 click==8.1.8
 colorama==0.4.6
-deepface==0.0.79
+deepface==0.0.93
 filelock==3.18.0
 fire==0.7.0
 Flask==2.2.5
@@ -31,7 +31,7 @@ libclang==18.1.1
 Markdown==3.8.2
 MarkupSafe==3.0.2
 mtcnn==0.1.1
-numpy==1.24.3
+numpy==1.23.5
 oauthlib==3.3.1
 opencv-python==4.11.0.86
 opt_einsum==3.4.0
