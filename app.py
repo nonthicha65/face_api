@@ -30,9 +30,7 @@ def verify():
         # ------------------------------------------------------------------
         if MODEL is None:
             MODEL = DeepFace.build_model("SFace")       # ~25 MB  ใช้ RAM น้อยมาก
-        if DETECTOR is None:
-            DETECTOR = DeepFace.build_detector("opencv")
-
+    
         # ------------------------------------------------------------------
         # 3) เซฟไฟล์ลง temp แล้วเรียก deepface.verify
         # ------------------------------------------------------------------
@@ -44,7 +42,6 @@ def verify():
             result = DeepFace.verify(
                 t1.name, t2.name,
                 model=MODEL,
-                detector_backend=DETECTOR,
                 enforce_detection=False
             )
 
