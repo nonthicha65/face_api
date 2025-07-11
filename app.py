@@ -42,6 +42,7 @@ def verify():
             result = DeepFace.verify(
                 t1.name, t2.name,
                 model=MODEL,
+                detector_backend = "opencv", 
                 enforce_detection=False
             )
 
