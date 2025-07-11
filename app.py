@@ -1,8 +1,5 @@
 import os
-# ---------------- TensorFlow/DeepFace – force CPU ----------------
-# ตั้งค่า env BEFORE import tensorflow / deepface
-os.environ["CUDA_VISIBLE_DEVICES"] = ""          # ปิดการมองเห็น GPU
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"         # ลด log verbosity ของ TF
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"  # บังคับใช้ CPU เท่านั้น
 
 from flask import Flask, request, jsonify
 from deepface import DeepFace
@@ -10,9 +7,9 @@ import tempfile
 
 app = Flask(__name__)
 
-# ========== โหลดโมเดลและตัวตรวจครั้งเดียวตอนบูต ==========
-MODEL    = DeepFace.build_model("ArcFace")        # เบากว่า Facenet+RetinaFace
-DETECTOR = DeepFace.build_detector("opencv")      # ไม่ต้องใช้ RetinaFace
+# ===== โหลดโมเดลและตัวตรวจจับไว้ล่วงหน้า =====
+MODEL    = DeepFace.build_model("ArcFace")
+DETECTOR = DeepFace.build_detector("opencv")
 
 @app.route("/")
 def home():
@@ -21,18 +18,17 @@ def home():
 @app.route("/verify", methods=["POST"])
 def verify():
     try:
-        img1, img2 = request.files.get("img1"), request.files.get("img2")
+        img1 = request.files.get("img1")
+        img2 = request.files.get("img2")
+
         if not img1 or not img2:
             return jsonify({"error": "img1 and img2 are required"}), 400
 
-        # --------- เซฟรูปลงไฟล์ชั่วคราว ----------
         with tempfile.NamedTemporaryFile(suffix=".jpg") as t1, \
              tempfile.NamedTemporaryFile(suffix=".jpg") as t2:
-
             img1.save(t1.name)
             img2.save(t2.name)
 
-            # --------- เปรียบเทียบใบหน้า ----------
             result = DeepFace.verify(
                 t1.name, t2.name,
                 model=MODEL,
@@ -47,14 +43,8 @@ def verify():
         })
 
     except Exception as e:
-        # log ลง stdout เพื่อให้ดูใน render log ได้
-        print("❌ Verification error:", e)
+        print("❌", e)
         return jsonify({"error": str(e)}), 500
 
-
-# ---------------------- Local / Render run -----------------------
 if __name__ == "__main__":
-    # ถ้า Render รันจะมีตัวแปร PORT ใส่มาให้
-    port = int(os.environ.get("PORT", 5000))
-    # debug=False เพื่อให้ gunicorn จับเวลา worker ได้ถูก
-    app.run(host="0.0.0.0", port=port, debug=False)
+    app.run(host="0.0.0.0", port=10000)
