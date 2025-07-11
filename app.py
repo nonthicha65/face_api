@@ -16,39 +16,24 @@ def home():
 
 @app.route("/verify", methods=["POST"])
 def verify():
-    global MODEL, DETECTOR
     try:
-        # ------------------------------------------------------------------
-        # 1) ตรวจสอบไฟล์รูป
-        # ------------------------------------------------------------------
-        img1, img2 = request.files.get("img1"), request.files.get("img2")
+        img1 = request.files.get("img1")
+        img2 = request.files.get("img2")
         if not img1 or not img2:
             return jsonify({"error": "img1 and img2 are required"}), 400
 
-        # ------------------------------------------------------------------
-        # 2) Lazy-load (โหลดโมเดล / detector ครั้งแรกเท่านั้น)
-        # ------------------------------------------------------------------
-        if MODEL is None:
-            MODEL = DeepFace.build_model("SFace")       # ~25 MB  ใช้ RAM น้อยมาก
-    
-        # ------------------------------------------------------------------
-        # 3) เซฟไฟล์ลง temp แล้วเรียก deepface.verify
-        # ------------------------------------------------------------------
         with tempfile.NamedTemporaryFile(suffix=".jpg") as t1, \
              tempfile.NamedTemporaryFile(suffix=".jpg") as t2:
             img1.save(t1.name)
             img2.save(t2.name)
 
             result = DeepFace.verify(
-                t1.name, t2.name,
-                model=MODEL,
-                detector_backend = "opencv", 
+                img1_path=t1.name,
+                img2_path=t2.name,
+                model_name="SFace",
                 enforce_detection=False
             )
 
-        # ------------------------------------------------------------------
-        # 4) ส่งผลลัพธ์กลับ
-        # ------------------------------------------------------------------
         return jsonify({
             "verified":  result["verified"],
             "distance":  result["distance"],
@@ -56,10 +41,8 @@ def verify():
         })
 
     except Exception as e:
-        # log error ใน stdout ของ container จะเห็นใน Render logs
         print("❌ DeepFace error:", e)
         return jsonify({"error": str(e)}), 500
-
 
 # ------------------------------------------------------------------
 # Local run (ใช้ gunicorn ใน Docker/prod อยู่แล้ว)
