@@ -1,5 +1,5 @@
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "-1"  # บังคับใช้ CPU เท่านั้น
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"   # ใช้ CPU เท่านั้น
 
 from flask import Flask, request, jsonify
 from deepface import DeepFace
@@ -7,7 +7,6 @@ import tempfile
 
 app = Flask(__name__)
 
-# ===== โหลดโมเดลและตัวตรวจจับไว้ล่วงหน้า =====
 MODEL    = DeepFace.build_model("ArcFace")
 DETECTOR = DeepFace.build_detector("opencv")
 
@@ -18,16 +17,13 @@ def home():
 @app.route("/verify", methods=["POST"])
 def verify():
     try:
-        img1 = request.files.get("img1")
-        img2 = request.files.get("img2")
-
+        img1, img2 = request.files.get("img1"), request.files.get("img2")
         if not img1 or not img2:
             return jsonify({"error": "img1 and img2 are required"}), 400
 
         with tempfile.NamedTemporaryFile(suffix=".jpg") as t1, \
              tempfile.NamedTemporaryFile(suffix=".jpg") as t2:
-            img1.save(t1.name)
-            img2.save(t2.name)
+            img1.save(t1.name); img2.save(t2.name)
 
             result = DeepFace.verify(
                 t1.name, t2.name,
@@ -35,16 +31,17 @@ def verify():
                 detector_backend=DETECTOR,
                 enforce_detection=False
             )
-
         return jsonify({
             "verified":  result["verified"],
             "distance":  result["distance"],
             "threshold": result["threshold"]
         })
-
     except Exception as e:
         print("❌", e)
         return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=10000)
+    # สำหรับรัน local เท่านั้น; บน Render จะใช้ gunicorn
+    import os
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=True)
